@@ -2,8 +2,6 @@
 
 A full-stack task management application with advanced features built with Next.js, React, and PostgreSQL.
 
-![Task Manager Pro](https://i.imgur.com/yUuHg3d.png)
-
 ## ✨ Features
 
 - **Modern UI/UX Design** with responsive layout and animations
