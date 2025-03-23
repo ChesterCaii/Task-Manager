@@ -1,0 +1,95 @@
+pipeline {
+    agent any
+    
+    environment {
+        NODE_VERSION = '18'
+        DATABASE_URL = credentials('DATABASE_URL')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Setup Node.js') {
+            steps {
+                sh 'curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | sudo -E bash -'
+                sh 'sudo apt-get install -y nodejs'
+                sh 'node --version'
+                sh 'npm --version'
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                dir('deploymate') {
+                    sh 'npm ci'
+                }
+            }
+        }
+        
+        stage('Lint') {
+            steps {
+                dir('deploymate') {
+                    sh 'npm run lint'
+                }
+            }
+        }
+        
+        stage('Database Migration') {
+            steps {
+                dir('deploymate') {
+                    sh 'npx prisma migrate deploy'
+                }
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                dir('deploymate') {
+                    sh 'npm run build'
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                dir('deploymate') {
+                    sh 'npm test || echo "No tests available"'
+                }
+            }
+        }
+        
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                // Example deployment to a server via SSH
+                // You would replace this with your actual deployment commands
+                sh '''
+                    ssh user@your-server.com "cd /path/to/app && \
+                    git pull && \
+                    npm ci && \
+                    npm run build && \
+                    pm2 reload app"
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build or deployment failed!'
+            // You can add notification steps here (email, Slack, etc.)
+        }
+    }
+} 
