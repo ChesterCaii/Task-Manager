@@ -27,12 +27,13 @@ jobs:
       - name: Install dependencies
         run: |
           cd deploymate
-          npm ci
-      
+          npm install
+
       - name: Build
         run: |
           cd deploymate
           npm run build
+          touch out/.nojekyll  # Prevent Jekyll processing
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -40,7 +41,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './deploymate/dist'
+          path: './deploymate/out'  # Changed from dist to out
 
   deploy:
     environment:
