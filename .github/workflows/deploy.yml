@@ -30,10 +30,15 @@ jobs:
           npm install
 
       - name: Build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /Task-Manager
         run: |
           cd deploymate
           npm run build
-          touch out/.nojekyll  # Prevent Jekyll processing
+          cp -r out/_next out/Task-Manager/
+          cp out/404.html out/Task-Manager/
+          cp out/index.html out/Task-Manager/
+          touch out/.nojekyll
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -41,7 +46,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './deploymate/out'  # Changed from dist to out
+          path: './deploymate/out'
 
   deploy:
     environment:
