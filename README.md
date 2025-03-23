@@ -1,4 +1,4 @@
-# Task Manager Pro
+# Task Manager
 
 A full-stack task management application with advanced features built with Next.js, React, and PostgreSQL.
 
